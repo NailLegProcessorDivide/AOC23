@@ -56,14 +56,6 @@
     )
 )
 
-;(let ((nums (collect-all(get-file "input.txt"))) (total 0))
-;    (progn
-;        (loop for n in nums
-;            do (setq total (+ total n)))
-;        (write "total ")
-;        (write total)
-;    )
-;)
 (let ((nums (collect-all(get-file "input.txt"))) (total 0))
     (progn
         (loop for n in nums
@@ -72,6 +64,3 @@
         (write total)
     )
 )
-
-;(write (collect-all(get-file "input.txt")))
-;(princ "end")

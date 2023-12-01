@@ -27,15 +27,6 @@
     )
 )
 
-;(defun section (inp)
-;    (loop for part = (first inp)
-;        while (not (string-equal part ""))
-;        collect (
-;            progn 
-;                (set 'inp (cdr inp))
-;                (write inp)
-;                (parse-integer part))))
-
 (let ((nums (collect-all(get-file "input.txt"))) (total 0))
     (progn
         (loop for n in nums
@@ -44,14 +35,3 @@
         (write total)
     )
 )
-(let ((nums (collect-all(get-file "input2.txt"))) (total 0))
-    (progn
-        (loop for n in nums
-            do (setq total (+ total n)))
-        (write "total ")
-        (write total)
-    )
-)
-
-;(write (collect-all(get-file "input.txt")))
-;(princ "end")
