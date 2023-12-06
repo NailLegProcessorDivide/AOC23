@@ -42,5 +42,5 @@
                 (loop for y from 0 to 139
                     collect (detectNum file x y))))))
 
-(let ((lines (get-file "input.txt")))
+(let ((lines (get-file "input2.txt")))
     (print (iterateMatrix lines)))

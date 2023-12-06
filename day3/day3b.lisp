@@ -7,20 +7,6 @@
 (defun access (file x y)
     (aref (nth y file) x))
 
-(defun isSym (c)
-    (and (not (digit-char-p c)) (not (string-equal "." c))))
-
-(defun detectSymbol (file x y)
-    (or (and (> x   0)           (isSym (access file (- x 1)       y)))
-        (and (> x   0) (> y   0) (isSym (access file (- x 1) (- y 1))))
-        (and (> x   0) (< y 139) (isSym (access file (- x 1) (+ y 1))))
-        (and           (> y   0) (isSym (access file       x (- y 1))))
-        (and           (< y 139) (isSym (access file       x (+ y 1))))
-        (and (< x 139)           (isSym (access file (+ x 1)       y)))
-        (and (< x 139) (> y   0) (isSym (access file (+ x 1) (- y 1))))
-        (and (< x 139) (< y 139) (isSym (access file (+ x 1) (+ y 1))))
-    ))
-
 (defun iterateFun (file x y value)
     (if (and (< x 140) (digit-char-p (access file x y) 10))
         (iterateFun file
@@ -87,9 +73,6 @@
                             (setq prod (* prod (getHead file (+ x 1) (+ y 1))))))
                 )
             )
-            (print "____")
-            (print nums)
-            (print prod)
             (if (= nums 2) prod 0)
         )
     )
@@ -107,5 +90,5 @@
                 (loop for y from 0 to 139
                     collect (detectAst file x y))))))
 
-(let ((lines (get-file "input.txt")))
+(let ((lines (get-file "input2.txt")))
     (print (iterateMatrix lines)))
