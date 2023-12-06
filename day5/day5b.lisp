@@ -20,21 +20,27 @@
 (defun scoreLine (winners mine score)
     (if mine
         (if (within (nth 0 mine) winners)
-            (if (= score 0)
-                (scoreLine winners (cdr mine) 1)
-                (scoreLine winners (cdr mine) (* score 2)))
+            (scoreLine winners (cdr mine) (+ score 1))
             (scoreLine winners (cdr mine) score))
         score))
 
 (defun parseParts (line)
     (let ((winners (readNumList (string-trim " " (nth 0 line)))) (mine (readNumList(string-trim " " (nth 1 line)))))
-        (print (scoreLine winners mine 0))))
+        (scoreLine winners mine 0)))
 
 (defun score (line)
     (parseParts (splitmi #\| (nth 1 (splitmi #\colon line)))))
 
-(defun acc-lines (lines)
-    (reduce '+ (loop for line in lines collect (score line))))
+(defun addCounts (counts n v)
+    (if (and counts (> n 0))
+        (cons (+ (nth 0 counts) v) (addCounts (cdr counts) (- n 1) v))
+        counts))
 
-(print (acc-lines (get-file "input.txt"))
-)
+(defun acc-lines (lines counts total)
+    (if lines
+        (acc-lines (cdr lines) (addCounts (cdr counts) (score (nth 0 lines)) (nth 0 counts)) (+ total (nth 0 counts)))
+        total))
+
+(let ((lines (get-file "input.txt")))
+    (print (acc-lines lines (loop for l in lines collect 1) 0)))
+

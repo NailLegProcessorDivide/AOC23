@@ -17,24 +17,17 @@
 (defun readNumList (inp)
     (loop for num in (splitmi #\space inp) collect (parse-integer num)))
 
-(defun scoreLine (winners mine score)
-    (if mine
-        (if (within (nth 0 mine) winners)
-            (if (= score 0)
-                (scoreLine winners (cdr mine) 1)
-                (scoreLine winners (cdr mine) (* score 2)))
-            (scoreLine winners (cdr mine) score))
-        score))
-
-(defun parseParts (line)
-    (let ((winners (readNumList (string-trim " " (nth 0 line)))) (mine (readNumList(string-trim " " (nth 1 line)))))
-        (print (scoreLine winners mine 0))))
-
-(defun score (line)
-    (parseParts (splitmi #\| (nth 1 (splitmi #\colon line)))))
+(defun score (time dist)
+    (reduce '+ (loop for n from 0 to time
+        collect (if (> (* n (- time n)) dist) 1 0))))
 
 (defun acc-lines (lines)
     (reduce '+ (loop for line in lines collect (score line))))
 
-(print (acc-lines (get-file "input.txt"))
-)
+(defun prepLine (line)
+    (readNumList (string-trim " " (nth 1 (splitmi #\: line)))))
+
+(let ((parts (loop for line in (get-file "input2.txt") collect (prepLine line))))
+    (print (reduce '* (loop for time in (nth 0 parts) for dist in (nth 1 parts)
+       collect (score time dist)))))
+
