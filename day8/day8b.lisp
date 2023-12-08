@@ -21,12 +21,12 @@
             nil)
         t))
 
-(defun takeSteps (directions maps positions)
+(defun takeSteps (directions maps position)
     (let ((d 0) (n 0))
         (progn
-            (loop while (not (done positions))
+            (loop while (not (char-equal (aref position 2) #\Z))
                 do (progn
-                    (setq positions (loop for position in positions collect (mapMe maps position (nth d directions))))
+                    (setq position (mapMe maps position (nth d directions)))
                     (setq d (+ d 1))
                     (setq d (if (= d (length directions)) 0 d))
                     (setq n (+ n 1))))
@@ -40,12 +40,12 @@
 
 (defun findStarts (mapping)
     (if mapping
-        (if (char-equal (print (aref (nth 0 (nth 0 mapping)) 2)) #\A)
+        (if (char-equal (aref (nth 0 (nth 0 mapping)) 2) #\A)
             (cons (nth 0 (nth 0 mapping)) (findStarts (cdr mapping)))
             (findStarts (cdr mapping)))
         ()))
 
 (let ((lines (get-file "input.txt")))
     (let ((directions (readDirections (nth 0 lines))) (mapping (readMapping (cdr lines))))
-    (print (takeSteps directions mapping (print (findStarts mapping))))))
+    (print (reduce 'lcm (loop for start in (findStarts mapping) collect (takeSteps directions mapping start))))))
 

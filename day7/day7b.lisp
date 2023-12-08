@@ -17,6 +17,14 @@
         )
         (list (list c 1))))
 
+(defun addCounts2 (c counts num)
+    (if counts
+        (if (char-equal (nth 0 (nth 0 counts)) c)
+            (cons (list (nth 0 (nth 0 counts)) (+ (nth 1 (nth 0 counts)) num)) (cdr counts))
+            (cons (nth 0 counts) (addCounts2 c (cdr counts) num))
+        )
+        (list (list c num))))
+
 (defun countCards (hand count)
     (if (string-equal "" hand)
         count
@@ -36,15 +44,18 @@
             (cons (nth 0 cards) (removeJ (cdr cards))))
         ()))
 
-(defun getMaxc (cards)
+(defun getMaxc (cards c i)
     (if cards
-        (if (char-equal (nth 0 (nth 0 cards)) #\J)
-            (cdr cards)
-            (cons (nth 0 cards) (removeJ (cdr cards))))
-        ()))
+        (if (> (nth 1 (nth 0 cards)) i)
+            (getMaxc (cdr cards) (nth 0 (nth 0 cards)) (nth 1 (nth 0 cards)))
+            (getMaxc (cdr cards) c i))
+        c))
 
 (defun reprocessCards (cards)
-    (let ((jokers (countJ cards)) (baseCards (removeJ cards)))))
+    (let ((jokers (countJ cards)) (baseCards (removeJ cards)))
+        (addCounts2 (getMaxc baseCards #\J 0) baseCards jokers)))
+(defun processCards (cards)
+    cards)
 
 (defun five (counts)
     (= (nth 1 (nth 0 counts)) 5))
@@ -82,7 +93,7 @@
         nil))
 
 (defun scoreHand (hand)
-    (let ((amnts (countCards hand ())))
+    (let ((amnts (reprocessCards (countCards hand ()))))
         (cond ((five amnts) 7)
               ((four amnts) 6)
               ((fullHouse amnts) 5)
@@ -92,15 +103,12 @@
               (t 1))))
 
 (defun sortCards (c1 c2)
-    (cond ((char-equal c1 c2) nil)
-          ((char-equal c1 #\A) nil)
+    (cond ((char-equal c1 #\A) nil)
           ((char-equal c2 #\A) t)
           ((char-equal c1 #\K) nil)
           ((char-equal c2 #\K) t)
           ((char-equal c1 #\Q) nil)
           ((char-equal c2 #\Q) t)
-          ((char-equal c1 #\J) nil)
-          ((char-equal c2 #\J) t)
           ((char-equal c1 #\T) nil)
           ((char-equal c2 #\T) t)
           ((char-equal c1 #\9) nil)
@@ -119,13 +127,15 @@
           ((char-equal c2 #\3) t)
           ((char-equal c1 #\2) nil)
           ((char-equal c2 #\2) t)
+          ((char-equal c1 #\J) nil)
+          ((char-equal c2 #\J) t)
           (t t)))
 
 (defun sortHand (l r)
     (if (string-equal l "")
         t
         (if (char-equal (aref l 0) (aref r 0))
-            (sortHand (subseq l 1) (subseq r 1))
+            (sortHand (print (subseq l 1)) (print (subseq r 1)))
             (sortCards (aref l 0) (aref r 0)))))
 
 (defun sortHands (l r)
@@ -136,11 +146,17 @@
 ; hand cards bid
 (defun prepLine (line)
     (let ((parts (splitmi #\space line)))
-        (list (scoreHand (nth 0 parts)) line (parse-integer (nth 1 parts)))))
+        (list (scoreHand (nth 0 parts)) (nth 0 parts) (parse-integer (nth 1 parts)))))
 
 (print (scoreHand "23456"))
-(print (scoreHand "aaabb"))
-
-(let ((parts (loop for line in (get-file "input2.txt") collect (prepLine line))))
+(print (scoreHand "32T3K"))
+(print (scoreHand "T55J5"))
+(print (scoreHand "KK677"))
+(print (scoreHand "KTJJT"))
+(print (scoreHand "QQQJA"))
+;246574824 high
+;246433301 low
+;   ||||||
+(let ((parts (loop for line in (get-file "input.txt") collect (prepLine line))))
     (print (reduce '+ (loop for hand in (sort parts 'sortHands) for i from 1 collect (* i (nth 2 hand))))))
 
