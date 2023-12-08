@@ -17,24 +17,40 @@
 (defun readNumList (inp)
     (loop for num in (splitmi #\space inp) collect (parse-integer num)))
 
-(defun scoreLine (winners mine score)
-    (if mine
-        (if (within (nth 0 mine) winners)
-            (if (= score 0)
-                (scoreLine winners (cdr mine) 1)
-                (scoreLine winners (cdr mine) (* score 2)))
-            (scoreLine winners (cdr mine) score))
-        score))
+(defun numInMapping (num mapping)
+    (and (>= num (nth 1 mapping)) (< num (+ (nth 2 mapping) (nth 1 mapping)))))
 
-(defun parseParts (line)
-    (let ((winners (readNumList (string-trim " " (nth 0 line)))) (mine (readNumList(string-trim " " (nth 1 line)))))
-        (print (scoreLine winners mine 0))))
+(defun useMap (num mapping)
+    (- (+ num (nth 0 mapping)) (nth 1 mapping)))
 
-(defun score (line)
-    (parseParts (splitmi #\| (nth 1 (splitmi #\colon line)))))
+(defun mapNum (num mapping)
+    (if mapping
+        (if (numInMapping num (nth 0 mapping))
+            (useMap num (nth 0 mapping))
+            (mapNum num (cdr mapping)))
+        num))
 
-(defun acc-lines (lines)
-    (reduce '+ (loop for line in lines collect (score line))))
+(defun mapSeed (seed maps)
+    (if maps
+        (mapSeed (mapNum seed (nth 0 maps)) (cdr maps))
+        seed))
 
-(print (acc-lines (get-file "input.txt"))
+
+(defun mapSeeds (seeds maps)
+    (loop for seed in seeds collect (mapSeed seed maps)))
+
+(defun parseMapping (lines maps)
+    (if lines
+        (if (string-equal "-" (nth 0 lines))
+            (cons maps (parseMapping (cdr lines) ()))
+            (parseMapping (cdr lines) (cons (readNumList (nth 0 lines)) maps)))
+        (list maps))
 )
+
+(defun parseSeeds (line)
+    (let ((line (nth 1 (splitmi #\: line))))
+        (loop for num in (splitmi #\space line) collect (parse-integer num))))
+
+(let ((file (get-file "input.txt")))
+    (let ((seeds (parseSeeds (nth 0 file))) (mapping (parseMapping (cdr file) ())))
+        (print (reduce 'min (mapSeeds seeds mapping)))))
