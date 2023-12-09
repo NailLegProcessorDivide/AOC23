@@ -36,6 +36,6 @@
 
 (let ((parts (loop for line in (get-file "input.txt") collect (readNumList line))))
     (progn
-        (print (sum (map 'list 'reverse 'process-list parts)))
+        (print (sum (map 'list 'process-list (map 'list 'reverse parts))))
         (print (sum (map 'list 'process-list parts)))))
 
