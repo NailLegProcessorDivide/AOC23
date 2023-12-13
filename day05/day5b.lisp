@@ -35,9 +35,14 @@
     (- (+ num (nth 0 mapping)) (nth 1 mapping)))
 
 (defun mapRange (range mapping)
-    (loop for mapp in mapping
-        do (progn
-            )
+    (let ((outRanges ()))
+        (progn
+            (loop for mapp in mapping for i from 1
+                do (if (mapInRange range mapp)
+                    (progn
+
+                )))))
+        (myflat outRanges))
         (if (numInMapping range (head mapping) 'sortOps)
             (useMap num (head mapping) 'sortOps)
             (mapRange range (cdr mapping)))
