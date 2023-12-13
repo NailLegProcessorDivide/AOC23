@@ -46,7 +46,10 @@
         (if xpos xpos
             (* (checkMask checkfn (nth 1 masks) 0) 100))))
 
+(defun doDay (checkfn chunks)
+    (reduce '+ (loop for chunk in chunks collect (findMirror checkfn chunk))))
+
 (let ((chunks (loop for chunk in (breakNewLines (get-file "input.txt")) collect (reencode chunk))))
     (progn
-        (print (reduce '+ (loop for chunk in chunks collect (findMirror 'part1 chunk))))
-        (print (reduce '+ (loop for chunk in chunks collect (findMirror 'part2 chunk))))))
+        (print (doDay 'part1 chunks))
+        (print (doDay 'part2 chunks))))
